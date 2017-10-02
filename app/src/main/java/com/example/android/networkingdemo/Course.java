@@ -11,6 +11,8 @@ public class Course {
     String name;
     String overview;
 
+    //Changes in different project
+
     public Course(int id, String title, String name, String overview) {
         this.id = id;
         this.title = title;
