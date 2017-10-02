@@ -50,6 +50,11 @@ public class MainActivity extends AppCompatActivity implements CourseAsyncTask.C
         listView.setAdapter(arrayAdapter);
 
         progressBar = (ProgressBar)findViewById(R.id.progressBar);
+
+
+
+
+
     }
 
 
