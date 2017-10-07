@@ -21,6 +21,12 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
 public class MainActivity extends AppCompatActivity implements CourseAsyncTask.CoursesDownloadListener{
 
     ArrayList<Course> courses = new ArrayList<>();
@@ -37,11 +43,46 @@ public class MainActivity extends AppCompatActivity implements CourseAsyncTask.C
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://codingninjas.in/api/v2/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        CoursesService service = retrofit.create(CoursesService.class);
+
+        final Call<CoursesResponse> coursesResponseCall = service.getCourses();
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-            fetchCourses();
+
+                listView.setVisibility(View.GONE);
+                progressBar.setVisibility(View.VISIBLE);
+
+
+                coursesResponseCall.enqueue(new Callback<CoursesResponse>() {
+                    @Override
+                    public void onResponse(Call<CoursesResponse> call, Response<CoursesResponse> response) {
+                        CoursesResponse coursesResponse = response.body();
+                        ArrayList<Course> courses = coursesResponse.data.courses;
+                        titles.clear();
+                        for(Course course:courses){
+                            titles.add(course.title);
+                        }
+
+                        arrayAdapter.notifyDataSetChanged();
+                        listView.setVisibility(View.VISIBLE);
+                        progressBar.setVisibility(View.GONE);
+                    }
+
+                    @Override
+                    public void onFailure(Call<CoursesResponse> call, Throwable t) {
+
+                    }
+                });
+
+            //fetchCourses();
             }
         });
 
